@@ -10,6 +10,7 @@ namespace KataFizzBuzz
     {
         string Translate(int input);
 
-        List<string> Counter(int input);
+        IEnumerable<string> Counter(int input);
+        IEnumerable<string> CounterFromReader();
     }
 }

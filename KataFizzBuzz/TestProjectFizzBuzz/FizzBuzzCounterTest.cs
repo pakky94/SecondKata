@@ -2,27 +2,20 @@ using KataFizzBuzz;
 using NUnit.Framework;
 using Moq;
 using System.Collections.Generic;
+using System;
 
 namespace TestProjectFizzBuzz
 {
     public class Tests
     {
-
         IFizzBuzzCounter _sut;
-
+        Mock<IReader> _readerMock;
 
         [SetUp]
         public void Setup()
         {
-            var mock = new Mock<IFizzBuzzCounter>();
-            mock.Setup(x => x.Translate(3)).Returns("Fizz");
-            mock.Setup(x => x.Translate(5)).Returns("Buzz");
-            mock.Setup(x => x.Translate(15)).Returns("FizzBuzz");
-            mock.Setup(x => x.Translate(1)).Returns("1");
-            mock.Setup(x => x.Translate(2)).Returns("2");
-            mock.Setup(x => x.Translate(4)).Returns("4");
-            _sut = mock.Object;
-
+            _readerMock = new Mock<IReader>();
+            _sut = new FizzBuzzCounter(_readerMock.Object);
         }
 
         [TestCase(1, ExpectedResult = "1")]
@@ -34,14 +27,44 @@ namespace TestProjectFizzBuzz
         public string TestFizzBuzz(int input) => _sut.Translate(input);
 
         [Test]
-        [Ignore("Ignore")]
         public void TestFizzBuzzCounter()
         {
             var expected = new List<string> { "1", "2", "Fizz" }; //continuous until your input number... o try to make a new test
             var actual = _sut.Counter(3);
             Assert.AreEqual(expected, actual);
         }
-        
 
+        [Test]
+        public void TestFizzBuzzCounter2()
+        {
+            var expected = new List<string> { "1", "2", "Fizz", "4", "Buzz", "Fizz" }; //continuous until your input number... o try to make a new test
+            var actual = _sut.Counter(6);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void TestFizzBuzzCounter_ZeroElements()
+        {
+            var expected = new List<string> ();
+            var actual = _sut.Counter(0);
+            Assert.AreEqual(expected, actual);
+        }
+        
+        [Test]
+        public void TestFizzBuzzCounter_NegativeElements_ThrowsException()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => { _sut.Counter(-5); });
+        }
+
+        [Test]
+        public void TestFizzBuzzCounterFromReader()
+        {
+            _readerMock.Setup(x => x.Read()).Returns(7);
+
+            var actual = _sut.CounterFromReader();
+
+            var expected = new List<string> { "1", "2", "Fizz", "4", "Buzz", "Fizz", "7" };
+            Assert.AreEqual(expected, actual);
+        }
     }
 }
